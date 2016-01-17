@@ -11,6 +11,6 @@
 4. Ability sort the books (regardless of their type)<br>
 
 **Bonus:**<br>
-Add the following features:
+Add the following features:<br>
 1. Ability to store in multiple media (for instance Kindle and Computer)<br>
 2. Ability to search a book by its name (or a portion of its name)<br>
