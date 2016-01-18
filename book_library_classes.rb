@@ -1,5 +1,6 @@
 class Library
   attr_accessor :books
+  attr_accessor :media
 
   def initialize
     @books = []
@@ -12,19 +13,50 @@ class Library
   end
 
   # To add a book to a library
-  def add_book(name, type)
+  def add_book
+    print "What is the name of the book you would like to add? "
+    name = gets.chomp
+    print "What is the type of the book you would like to add? "
+    type = gets.chomp
     case type
     when "paper book"
       PaperBook.new(name, type)
       @books << [name, type]
+      puts "You have added #{name}!"
     when "ebook"
       Ebook.new(name, type)
       @books << [name, type]
+      puts "You have added #{name}!"
     when "audiobook"
       Audiobook.new(name, type)
       @books << [name, type]
+      puts "You have added #{name}!"
     else
       puts "That's not a book format we recognize."
+    end
+  end
+
+  def display
+    loop do
+      print "How would you like to display your books? (sorted (all), unsorted (all), by media, by type) Type back to exit. "
+      display_method = gets.chomp.downcase
+      case
+      when display_method.include?("unsort")
+        all
+      when display_method.include?("sort")
+        sort
+      when display_method.include?("media")
+        print "What media would you like to display? (Select bookshelf, computer, Kindle, or iPad) "
+        media = gets.chomp.downcase
+        display_by_media(media)
+      when display_method.include?("type")
+        print "What type would you like to display? (Select paper book, ebook, or audiobook) "
+        type = gets.chomp.downcase
+        display_by_type(type)
+      else
+        puts "I don't recognize that command."
+      end
+      break if display_method == "back"
     end
   end
 
@@ -36,7 +68,7 @@ class Library
   # Search for a keyword within book names
   def search(word)
     results = []
-    @books.each {|item| results << item if item[0].include?(word) }
+    @books.each {|item| results << item if item[0].downcase.include?(word) }
     results.empty? ? (puts "Search returned no results...") : (results.each {|item| puts "#{item[0]} (#{item[1]})"})
   end
 
@@ -53,19 +85,23 @@ class Library
   def display_by_media(media)
     case media
     when "bookshelf"
+      puts "Your bookshelf is empty!" if @bookshelf_library.empty?
       @bookshelf_library.sort.each {|item| puts "#{item[0]} (#{item[1]})"}
     when "computer"
+      puts "Your computer is empty!" if @computer_library.empty?
       @computer_library.sort.each {|item| puts "#{item[0]} (#{item[1]})"}
     when "kindle"
+      puts "Your Kindle is empty!" if @kindle_library.empty?
       @kindle_library.sort.each {|item| puts "#{item[0]} (#{item[1]})"}
     when "ipad"
+      puts "Your iPad is empty!" if @ipad_library.empty?
       @ipad_library.sort.each {|item| puts "#{item[0]} (#{item[1]})"}
     end
-
   end
 
   # To store a book in a particular media type
-  # method to add book to a media library
+
+  # Method to add book to a media library
   def add_to_media
     puts "What would you like to store #{@book_to_store[0]} in? "
     media_type = gets.chomp.downcase
@@ -73,23 +109,12 @@ class Library
       puts "That's not a specified media type!"
     else
       @media.each do |key, library|
-        library << @book_to_store if media_type.include? key.to_s
+        if media_type.include? key.to_s
+          library << @book_to_store
+          puts "You have added #{@book_to_store[0]} to your #{key}!"
+        end
       end
     end
-    # case media_type
-    # when "computer"
-    #   @computer_library << @book_to_store
-    # when "kindle"
-    #   @kindle_library << @book_to_store
-    # when "ipad"
-    #   @ipad_library << @book_to_store
-    # when "all"
-    #   @computer_library, @kindle_library, @ipad_library << @book_to_store
-    #   @kindle_library << @book_to_store
-    #   @ipad_library << @book_to_store
-    # else
-    #   puts "That's not a specified media type!"
-    # end
   end
 
   def store(book)
@@ -113,11 +138,10 @@ class Library
     when "paper book"
       @bookshelf_library << @book_to_store
     when "ebook"
-      add_to_media(media_type)
+      add_to_media
     when "audiobook"
-      add_to_media(media_type)
+      add_to_media
     end
-
   end
 
 end
@@ -144,6 +168,7 @@ class Audiobook < Library
 end
 
 # ----------------------------------------------------------------------------
+# Might use these classes if I want to give it the capability of multiple media of the same type
 
 class Bookshelf < Library
   def initialize(media_type = "bookshelf")
